@@ -56,6 +56,7 @@ class MenuItemTableViewCell: UITableViewCell {
     }
 
     private func setupUI() {
+        selectionStyle = .none
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         itemImageView.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
