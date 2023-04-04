@@ -7,34 +7,32 @@
 
 import Foundation
 
-enum NetworkError {
+enum NetworkError: Error {
     case failedURL
     case parsingError
     case emptyData
 }
 
 class NetworkManager {
-    func fetchMenu(
+    func fetchResponse<T: Decodable>(
         category: String,
-        onCompletion: @escaping ((Menu) -> Void),
-        onError: @escaping ((NetworkError) -> Void)
+        onCompletion: @escaping ((Result<T, NetworkError>) -> Void)
     ) {
         guard let url = createURLcomponents(category: category) else {
-            onError(.failedURL)
+            onCompletion(.failure(.failedURL))
             return
         }
 
         URLSession.shared.dataTask(with: url) { data, _, _ in
-            if let data = data {
-                do {
-                    if let menu = try self.parseJSON(withData: data) {
-                        onCompletion(menu)
-                    }
-                } catch {
-                    onError(.parsingError)
-                }
-            } else {
-                onError(.emptyData)
+            guard let data = data else {
+                onCompletion(.failure(.emptyData))
+                return
+            }
+            do {
+                let reponse = try JSONDecoder().decode(T.self, from: data)
+                onCompletion(.success(reponse))
+            } catch {
+                onCompletion(.failure(.parsingError))
             }
         }.resume()
     }
@@ -51,11 +49,5 @@ class NetworkManager {
         ]
 
         return urlComponents.url
-    }
-
-    private func parseJSON(withData data: Data) throws -> Menu? {
-        let decoder = JSONDecoder()
-        let menuData = try decoder.decode(Menu.self, from: data)
-        return menuData
     }
 }

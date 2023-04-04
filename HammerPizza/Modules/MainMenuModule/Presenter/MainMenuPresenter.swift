@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MainMenuPresenter {
+class MainMenuPresenter: MainMenuPresenterProtocol {
     weak var view: MainMenuViewInput?
 
     var currentCity: String = "Москва"
@@ -64,14 +64,9 @@ class MainMenuPresenter {
 
     private func fetchAllMenuItems() {
         self.menuItems = []
-        let globalSerialQueue = DispatchQueue(label: "GlobalSerialQueue")
-        let group = DispatchGroup()
-        globalSerialQueue.async {
+        DispatchQueue.global(qos: .userInitiated).async {
             for category in MealType.allCases {
-                group.enter()
-                NetworkManager().fetchMenu(
-                    category: category.rawValue
-                ) { [weak self] response in
+                API.fetchMenu(category: category.rawValue) { [weak self] response in
                     guard let self = self else { return }
                     let dataToShow = response.results
                     dataToShow.forEach {
@@ -83,11 +78,7 @@ class MainMenuPresenter {
                             self.view?.reloadTableView()
                         }
                     }
-                    group.leave()
-                } onError: { error in
-                    print(error)
                 }
-                group.wait()
             }
             DispatchQueue.main.async {
                 self.view?.reloadTableViewWithBool(shown: true)

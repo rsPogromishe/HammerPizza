@@ -31,45 +31,9 @@ class MainMenuViewController: UIViewController {
         presenter.viewDidLoad()
         setupNavigationBar()
     }
-
-    private func setupNavigationBar() {
-        let title = UIBarButtonItem(
-            title: presenter.currentCity,
-            style: .plain,
-            target: self,
-            action: nil
-        )
-        let arrow = UIBarButtonItem(
-            image: UIImage(systemName: "chevron.down"),
-            style: .done,
-            target: self,
-            action: nil
-        )
-        arrow.imageInsets = UIEdgeInsets(top: 0, left: -32, bottom: 0, right: 0)
-        navigationItem.leftBarButtonItems = [ title, arrow ]
-        navigationController?.navigationBar.tintColor = .black
-        navigationController?.navigationBar.barTintColor = .systemGroupedBackground
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
-    }
-
-    private func setupUI() {
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tableView)
-
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.register(MenuItemTableViewCell.self, forCellReuseIdentifier: MenuItemTableViewCell.identifier)
-        tableView.register(CollectionTableViewCell.self, forCellReuseIdentifier: CollectionTableViewCell.identifier)
-
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
 }
+
+// MARK: TableView Delegate/DataSource
 
 extension MainMenuViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -183,6 +147,8 @@ extension MainMenuViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+// MARK: FooterViewTapDelegate
+
 extension MainMenuViewController: FooterViewTapDelegate {
     func moveTo(category: String) {
         let array = self.allCategoriesShown ? presenter.menuItems : presenter.menuItemsCache
@@ -190,6 +156,8 @@ extension MainMenuViewController: FooterViewTapDelegate {
         self.tableView.scrollToRow(at: IndexPath(row: firstCategoryItem, section: 1), at: .top, animated: true)
     }
 }
+
+// MARK: MainMenuViewInput
 
 extension MainMenuViewController: MainMenuViewInput {
     func reloadTableView() {
@@ -199,5 +167,47 @@ extension MainMenuViewController: MainMenuViewInput {
     func reloadTableViewWithBool(shown: Bool) {
         tableView.reloadData()
         allCategoriesShown = true
+    }
+}
+
+// MARK: Setup UI
+
+extension MainMenuViewController {
+    private func setupNavigationBar() {
+        let title = UIBarButtonItem(
+            title: presenter.currentCity,
+            style: .plain,
+            target: self,
+            action: nil
+        )
+        let arrow = UIBarButtonItem(
+            image: UIImage(systemName: "chevron.down"),
+            style: .done,
+            target: self,
+            action: nil
+        )
+        arrow.imageInsets = UIEdgeInsets(top: 0, left: -32, bottom: 0, right: 0)
+        navigationItem.leftBarButtonItems = [ title, arrow ]
+        navigationController?.navigationBar.tintColor = .black
+        navigationController?.navigationBar.barTintColor = .systemGroupedBackground
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
+    }
+
+    private func setupUI() {
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(MenuItemTableViewCell.self, forCellReuseIdentifier: MenuItemTableViewCell.identifier)
+        tableView.register(CollectionTableViewCell.self, forCellReuseIdentifier: CollectionTableViewCell.identifier)
+
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 }

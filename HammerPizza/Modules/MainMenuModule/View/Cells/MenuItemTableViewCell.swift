@@ -55,6 +55,14 @@ class MenuItemTableViewCell: UITableViewCell {
         setupUI()
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        nameLabel.text = ""
+        descriptionLabel.text = ""
+        minimumPriceButton.setTitle("", for: .normal)
+        itemImageView.image = UIImage()
+    }
+
     private func setupUI() {
         selectionStyle = .none
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
